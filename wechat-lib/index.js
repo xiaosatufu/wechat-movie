@@ -66,6 +66,7 @@ module.exports = class Wechat {
             return true
         } else {
             return false
-        }
+        }   
     }
 }
+// test git
