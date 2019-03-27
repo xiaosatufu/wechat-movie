@@ -1,8 +1,13 @@
 const request = require('request-promise')
 const base = 'https://api.weixin.qq.com/cgi-bin/'
+const mpBase = 'https://mp.weixin.qq.com/cgi-bin/'
 
 const api = {
-    accessToken: base + 'token?grant_type=client_credential'
+    accessToken: base + 'token?grant_type=client_credential',
+    qrcode: {
+        create: base + 'qrcode/create?',
+        show: mpBase + 'showqrcode?'
+    }
 }
 module.exports = class Wechat {
     constructor(opts) {
@@ -66,6 +71,25 @@ module.exports = class Wechat {
             return true
         } else {
             return false
+        }
+    }
+
+    //创建二维码ticket
+    createQrcode(token, qr) {
+        const url = api.qrcode.create + 'access_token=' + token
+        const body = qr
+        return {
+            method: 'POST',
+            url,
+            body
+        }
+
+    }
+    //通过ticket 换取二维码
+    showQrcode(token, ticket) {
+        const url = api.qrcode.show + 'ticket=' + encodeURI(ticket)
+        return {
+            url
         }
     }
 }
