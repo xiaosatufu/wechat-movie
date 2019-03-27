@@ -71,7 +71,7 @@ module.exports = class Wechat {
             return true
         } else {
             return false
-        }
+        }   
     }
 
     //创建二维码ticket
@@ -93,3 +93,5 @@ module.exports = class Wechat {
         }
     }
 }
+
+// test git

@@ -23,7 +23,7 @@ module.exports = (config,reply) => {
                 ctx.body = 'failed'
             }
         } else if (ctx.method==='POST') {
-            if (sha !== signature) {    
+            if (sha !== signature) {
                 return (ctx.body='failed')
             }
 
