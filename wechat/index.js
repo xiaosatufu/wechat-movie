@@ -28,5 +28,9 @@ exports.test= async () => {
     // console.log(client)
     const data = await client.fetchAccessToken()
     console.log('data in db')
-    console.log(data)
+    // console.log(data)
+}
+
+exports.getWechat = () =>{
+    return new Wechat(wechatCfg.wechat)
 }

@@ -7,6 +7,9 @@ const api = {
     qrcode: {
         create: base + 'qrcode/create?',
         show: mpBase + 'showqrcode?'
+    },
+    shortUrl: {
+        create: base + 'shorturl?'
     }
 }
 module.exports = class Wechat {
@@ -71,7 +74,15 @@ module.exports = class Wechat {
             return true
         } else {
             return false
-        }   
+        }
+    }
+
+
+    async handle(operation, ...args) {
+        const tokenData = await this.fetchAccessToken()
+        const options = this[operation](tokenData.token, ...args)
+        const data = await this.request(options)
+        return data
     }
 
     //创建二维码ticket
@@ -86,11 +97,24 @@ module.exports = class Wechat {
 
     }
     //通过ticket 换取二维码
-    showQrcode(token, ticket) {
+    showQrcode(ticket) {
         const url = api.qrcode.show + 'ticket=' + encodeURI(ticket)
-        return {
-            url
+        return url
+
+    }
+    //长链接转短链接
+    createShortUrl(token, action = 'long2short', longurl) {
+        const url = api.shortUrl.create + 'access_token=' + token
+        const body = {
+            action,
+            long_url: longurl
         }
+        return {
+            method:'POST',
+            url,
+            body
+        }
+
     }
 }
 
