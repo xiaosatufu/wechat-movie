@@ -1,4 +1,6 @@
-const {resolve}  = require('path')
+const {
+    resolve
+} = require('path')
 let reply = async (ctx, next) => {
     const message = ctx.weixin
     let mp = require('./index')
@@ -24,16 +26,28 @@ let reply = async (ctx, next) => {
                     }
                 }
             }
-            let tempTicketData = await client.handle('createQrcode',tempQrData)
+            let tempTicketData = await client.handle('createQrcode', tempQrData)
             console.log(tempTicketData)
-            let tempQr =  client.showQrcode(tempTicketData.ticket)
+            let tempQr = client.showQrcode(tempTicketData.ticket)
             console.log(tempQr)
             reply = tempQr
-        } else if (content ==='16') {
+        } else if (content === '16') {
             const longurl = 'https://github.com/xiaosatufu?tab=stars'
-            let shortData = await client.handle('createShortUrl','long2short',longurl)
+            let shortData = await client.handle('createShortUrl', 'long2short', longurl)
             console.log(shortData)
             reply = shortData.short_url
+        } else if (content === '17') {
+            let semanticData = {
+                query: '查一下明天从杭州到北京的南航机票',
+                city: '杭州',
+                category: 'flight,hotel',
+                uid: message.FromUserName
+            }
+            let searchData = await client.handle('semantic', semanticData)
+
+            console.log(searchData)
+
+            reply = JSON.stringify(searchData)
         }
         ctx.body = reply
     }

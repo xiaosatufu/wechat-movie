@@ -1,8 +1,10 @@
 const request = require('request-promise')
 const base = 'https://api.weixin.qq.com/cgi-bin/'
 const mpBase = 'https://mp.weixin.qq.com/cgi-bin/'
-
+const semanticUrl ='https://api.weixin.qq.com/semantic/semproxy/search?'
+    
 const api = {
+    semanticUrl,
     accessToken: base + 'token?grant_type=client_credential',
     qrcode: {
         create: base + 'qrcode/create?',
@@ -10,7 +12,7 @@ const api = {
     },
     shortUrl: {
         create: base + 'shorturl?'
-    }
+    },
 }
 module.exports = class Wechat {
     constructor(opts) {
@@ -81,6 +83,7 @@ module.exports = class Wechat {
     async handle(operation, ...args) {
         const tokenData = await this.fetchAccessToken()
         const options = this[operation](tokenData.token, ...args)
+        console.log(options)
         const data = await this.request(options)
         return data
     }
@@ -116,6 +119,20 @@ module.exports = class Wechat {
         }
 
     }
+
+    //查询特定的语句进行分析
+    semantic(token, semanticData) {
+        const url = api.semanticUrl + 'access_token=' + token
+        console.log(url)
+        semanticData.appID = this.appID
+        return {
+            method:'POST',
+            url,
+            body:semanticData
+        }
+
+    }
+
 }
 
 // test git
