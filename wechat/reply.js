@@ -48,6 +48,49 @@ let reply = async (ctx, next) => {
             console.log(searchData)
 
             reply = JSON.stringify(searchData)
+        } else if (content === '18') {
+            try {
+                let deleteData = await client.handle('deleteMenu')
+                console.log(deleteData)
+                let menu = {
+                    button: [{
+                        name:'一级菜单',
+                        sub_button:[
+                            {
+                                name:'二级菜单1',
+                                type:'click',
+                                key:'no_1'
+                            },
+                            {
+                                name:'二级菜单2',
+                                type:'click',
+                                key:'no_2'
+                            },
+                            {
+                                name:'二级菜单3',
+                                type:'click',
+                                key:'no_3'
+                            }
+                        ]
+                    },
+                        {
+                            name:'分类',
+                            type:"view",
+                            url:'http://www.baidu.com'
+                        },
+                        {
+                            name:'新菜单_'+Math.random(),
+                            type:'click',
+                            key:'new_111'
+                        }
+                    ]
+                }
+                let createData = await client.handle('createMenu', menu)
+                console.log(createData)
+            } catch (e) {
+                console.log(e)
+            }
+            reply = '菜单创建成功'
         }
         ctx.body = reply
     }

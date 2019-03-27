@@ -1,8 +1,8 @@
 const request = require('request-promise')
 const base = 'https://api.weixin.qq.com/cgi-bin/'
 const mpBase = 'https://mp.weixin.qq.com/cgi-bin/'
-const semanticUrl ='https://api.weixin.qq.com/semantic/semproxy/search?'
-    
+const semanticUrl = 'https://api.weixin.qq.com/semantic/semproxy/search?'
+
 const api = {
     semanticUrl,
     accessToken: base + 'token?grant_type=client_credential',
@@ -13,6 +13,10 @@ const api = {
     shortUrl: {
         create: base + 'shorturl?'
     },
+    menu: {
+        create: base + 'menu/create?',
+        delete: base + 'menu/delete?'
+    }
 }
 module.exports = class Wechat {
     constructor(opts) {
@@ -113,7 +117,7 @@ module.exports = class Wechat {
             long_url: longurl
         }
         return {
-            method:'POST',
+            method: 'POST',
             url,
             body
         }
@@ -126,11 +130,23 @@ module.exports = class Wechat {
         console.log(url)
         semanticData.appID = this.appID
         return {
-            method:'POST',
+            method: 'POST',
             url,
-            body:semanticData
+            body: semanticData
         }
 
+    }
+    //menu
+    createMenu(token, menu) {
+        const url = api.menu.create +'access_token=' + token
+        return {method:'POST',url,body:menu}
+    }
+    //menu
+    deleteMenu(token) {
+        const url = api.menu.delete + 'access_token=' + token
+        return {
+            url
+        }
     }
 
 }

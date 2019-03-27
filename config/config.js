@@ -15,5 +15,6 @@ module.exports = {
         appID:'wxc931075f4a1c0259',
         appsecret:'0f348d94b52577b21f0bc7a5272bc3c4',
         token:'xiaosatufuxiaosatufuxiaosatufuxi'
-    }
+    },
+    baseUrl: 'http://wechat8888.vipgz1.idcfengye.com/'
 }
