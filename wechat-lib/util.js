@@ -1,6 +1,6 @@
 const xml2js = require('xml2js')
 const template = require('./tpl')
-
+const sha1 = require('sha1')
 exports.parseXML = xml => {
     return new Promise((resolve, reject) => {
         xml2js.parseString(xml, {
@@ -14,17 +14,17 @@ exports.parseXML = xml => {
 }
 
 
-const formatMessage = result => {
+exports.formatMessage = result => {
     let message = {}
-    if (typeof result==='object') {
+    if (typeof result === 'object') {
         const keys = Object.keys(result)
-        for(let i=0;i<keys.length;i++){
+        for (let i = 0; i < keys.length; i++) {
             let item = result[keys[i]]
             let key = keys[i]
-            if (!(item instanceof Array) || item.length===0) {
+            if (!(item instanceof Array) || item.length === 0) {
                 continue
             }
-            if (item.length===1) {
+            if (item.length === 1) {
                 let val = item[0]
                 if (typeof val === 'object') {
                     message[key] = formatMessage(val)
@@ -33,7 +33,7 @@ const formatMessage = result => {
                 }
             } else {
                 message[key] = []
-                for(let j = 0;j<item.length;j++) {
+                for (let j = 0; j < item.length; j++) {
                     message[key].push(formatMessage(item[j]))
                 }
             }
@@ -43,10 +43,10 @@ const formatMessage = result => {
 }
 
 
-exports.tpl = (content,message) => {
+exports.tpl = (content, message) => {
     let type = 'text'
     if (Array.isArray(content)) {
-        type='news'
+        type = 'news'
     }
     if (!content) content = 'Empty news'
     if (content && content.type) {
@@ -54,12 +54,12 @@ exports.tpl = (content,message) => {
     }
 
     let info = {
-        content:content,
-        msgType:type,
-        msgId:message.MsgId,
-        createTime:new Date().getTime(),
-        toUserName:message.FromUserName,
-        fromUserName:message.ToUserName
+        content: content,
+        msgType: type,
+        msgId: message.MsgId,
+        createTime: new Date().getTime(),
+        toUserName: message.FromUserName,
+        fromUserName: message.ToUserName
     }
 
     // let info = Object.assign({},{
@@ -72,7 +72,59 @@ exports.tpl = (content,message) => {
     // })0
     return template(info)
 
-    
+
 }
 
-exports.formatMessage = formatMessage
+
+const createNonce  = () => {
+    return Math.random().toString(36).substr(2, 6)
+}
+const createTimestame = () => {
+    return parseInt(new Date().getTime() / 1000, 10) + ''
+
+}
+
+//字典排序
+const singIt = (paramsObj) => {
+    let keys = Object.keys(paramsObj)
+    let newArgs = {}
+    let str = ''
+
+    keys = keys.sort()
+    keys.forEach(key => {
+        newArgs[key.toLowerCase()] = paramsObj[key]
+    })
+    for (let k in newArgs) {
+        str += '&' + k + '=' + newArgs[k]
+    }
+    return str.substr(1)
+}
+
+const shaIt = (nonce, ticket, timestamp, url) => {
+    const ret = {
+        jsapi_ticket: ticket,
+        nonceStr: nonce,
+        timestamp: timestamp,
+        url
+    }
+    const str = singIt(ret)
+    const sha = sha1(str)
+    return sha
+}
+
+
+const sign = (ticket,url) =>{
+    const nonceStr = createNonce()
+    console.log(nonceStr)
+    const timestamp = createTimestame()
+    const signature = shaIt(nonceStr,ticket,timestamp,url)
+    return {
+        nonceStr,
+        timestamp,
+        signature
+    }
+}
+
+exports.sign = sign
+
+// exports.formatMessage = formatMessage

@@ -16,6 +16,9 @@ const api = {
     menu: {
         create: base + 'menu/create?',
         delete: base + 'menu/delete?'
+    },
+    ticket: {
+        get: base + 'ticket/getticket?'
     }
 }
 module.exports = class Wechat {
@@ -25,6 +28,8 @@ module.exports = class Wechat {
         this.appsecret = opts.appsecret
         this.getAccessToken = opts.getAccessToken
         this.saveAccessToken = opts.saveAccessToken
+        this.getTicket = opts.getTicket
+        this.saveTicket = opts.saveTicket
 
         this.fetchAccessToken()
     }
@@ -47,7 +52,7 @@ module.exports = class Wechat {
         //     // console.log(1)
         //     data = await this.getAccessToken()
         // }
-        if (!this.isValidToken(data)) {
+        if (!this.isValid(data)) {
             data = await this.updateAccessToken()
         }
         await this.saveAccessToken(data)
@@ -69,7 +74,37 @@ module.exports = class Wechat {
 
     }
 
-    isValidToken(data) {
+    async fetchTicket(token) {
+        let data = await this.getTicket()
+        if (!this.isValid(data, 'ticket')) {
+            data = await this.updateTicket(token)
+
+        }
+        await this.saveTicket(data)
+        return data
+    }
+
+
+
+
+    async updateTicket(token) {
+        const url = `${api.ticket.get}access_token=${token}&type=jsapi`
+
+        const data = await this.request({
+            url
+        })
+        const now = new Date().getTime()
+        const expiresIn = now + (data.expires_in - 20) * 1000
+
+        data.expires_in = expiresIn
+
+        return data
+    }
+
+
+
+
+    isValid(data) {
         if (!data || !data.expires_in) {
             return false
         }
@@ -138,8 +173,12 @@ module.exports = class Wechat {
     }
     //menu
     createMenu(token, menu) {
-        const url = api.menu.create +'access_token=' + token
-        return {method:'POST',url,body:menu}
+        const url = api.menu.create + 'access_token=' + token
+        return {
+            method: 'POST',
+            url,
+            body: menu
+        }
     }
     //menu
     deleteMenu(token) {
